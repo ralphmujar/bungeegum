@@ -10,7 +10,8 @@
 
 "ret"       { return RET; }
 
-";"         { return ';'; }
+[-+;]         return *yytext;
+
 
 [ \t]+       /* ignore whitespaces */
 

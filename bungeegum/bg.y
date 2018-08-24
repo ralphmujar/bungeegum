@@ -4,7 +4,7 @@
     int yylex(void);
     void yyerror(char *);
     FILE *yyin, *fp;
-    void codegen();
+    int  node(char *token, int l, int r);
 %}
 
 
@@ -12,10 +12,10 @@
 
 
 %%
-p: e            { codegen($1); }
- ;
-e: RET NUM ';'  { $$ = $3; }
- ;
+e: e '+' e ';' {$$ = node("+", $1, $3); }
+  |  e '-' e ';'  { $$ = node("-", $1, $3); }
+  | NUM
+  ;
 %%
 
 void yyerror(char *s) {
@@ -42,12 +42,24 @@ int main(int argc, char *argv[])
 }
 
 
-void codegen(int data)
-{    
+int node(char *token, int l, int r)
+{
+   switch (*token)
+   {
+   case '+':
+     token = "add";
+     break;
+   case '-':
+     token = "sub";
+     break;
+   }
+   
    fp = fopen("a.s", "w");
    fprintf(fp, ".text \n.global _start \n\n");
    fprintf(fp, "_start: \n");
-   fprintf(fp, "       mov r0, #%d \n", data);
+   fprintf(fp, "       mov r1, #%d \n", l);
+   fprintf(fp, "       mov r2, #%d \n", r);
+   fprintf(fp, "       %s r0, r1, r2 \n", token);
    fprintf(fp, "       mov r7, #1 \n");
    fprintf(fp, "swi 0\n"); 
    fclose(fp);
