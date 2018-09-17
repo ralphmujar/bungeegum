@@ -1,2 +1,2 @@
 # bungeegum
-tiny compiler
+tiny compiler using flex & bison
